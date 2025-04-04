@@ -1,0 +1,4 @@
+java.lang.IndexOutOfBoundsException: Empty list doesn't contain element at index 1.
+	at kotlin.collections.EmptyList.get(Collections.kt:37)
+	at kotlin.collections.EmptyList.get(Collections.kt:25)
+	at Tempscript.<init>(tempscript.kts:3)
