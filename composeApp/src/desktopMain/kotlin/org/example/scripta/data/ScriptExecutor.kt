@@ -42,7 +42,8 @@ class ScriptExecutor {
         val isWindows = System.getProperty("os.name").startsWith("Windows")
 
         val processBuilder = if (isWindows)ProcessBuilder("cmd", "/c", "kotlinc -script ${scriptFile.absolutePath}")
-        else ProcessBuilder("kotlinc -script ${scriptFile.absolutePath}")
+        else ProcessBuilder("sh","-c","kotlinc -script ${scriptFile.absolutePath}")
+
 
 
         process = withContext(Dispatchers.IO) {
