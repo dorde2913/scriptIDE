@@ -37,6 +37,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation("org.jetbrains.kotlin:kotlin-compiler:2.1.20")
 
+
         }
     }
 }

@@ -1,4 +1,4 @@
-package org.example.scripta.textEditor
+package org.example.scripta.composables.textEditor
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState

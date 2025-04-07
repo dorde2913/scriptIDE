@@ -1,4 +1,8 @@
-var list: List<Int> = listOf()
+val list: List<Int> = listOf()
 
-println(list[1])
 
+repeat(10){
+	print("$it :D")
+}
+
+println(list[0])

@@ -63,7 +63,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.example.scripta.textEditor.TextEditor
+import org.example.scripta.composables.ErrorPane
+import org.example.scripta.composables.textEditor.TextEditor
 import org.example.scripta.data.ScriptViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import java.awt.Cursor
@@ -72,8 +73,7 @@ import java.awt.Cursor
 @Composable
 @Preview
 fun App() {
-
-
+    
     MaterialTheme {
 
 
@@ -203,11 +203,6 @@ fun App() {
 
             ) {
                 Text("Output: ", color = Color.White)
-//                Box(
-//                    modifier = Modifier.size(30.dp).background(
-//                        if (state.running) Color.Green else Color.Transparent
-//                    )
-//                )
                 if (state.running) IndeterminateCircularIndicator()
                 else {
                     if (!state.error) Icon(Icons.Default.CheckCircle,null,tint = Color.Green)
@@ -215,75 +210,36 @@ fun App() {
                 }
             }
 
+
+
+
             Box(
                 modifier = Modifier.height(resultTabHeight)
             ){
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                        .height(resultTabHeight)
-                        .background(Color.Black)
-                        .verticalScroll(
-                            errorStateVertical
-                        )
 
-                ) {
-
-
-
-                    state.outputList.forEachIndexed { index, line ->
-                        Text(line, color = Color.White,modifier = Modifier.horizontalScroll(errorStateHorizontal))
-                    }
-
-
-                    state.errorList.forEach {
-                        if (it.contains("tempscript.kt")) {//replace if we implement multiple files
-                            Text(
-                                text = it,
-                                color = Color.Red,
-                                modifier = Modifier.clickable {
-
-                                    val substring = it.substringAfter("tempscript.kt")
-                                    val segments = substring.split(':')
-
-                                    val row = segments[1].substringBefore(')').toInt()
-                                    val column = if (segments.size > 2) segments[2].toInt() else 1
-
-                                    /*
-                                     some exception messages contain only the line number, while others contain the character aswell
-                                     */
-                                    val errorIndex = getErrorIndex(textState.text, row, column)
-
-                                    focusRequester.requestFocus()
-                                    //println("ERROR INDEX: $errorIndex")
-                                    textState = textState.copy(selection = TextRange(errorIndex))
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        bringIntoViewRequester.bringIntoView(
-                                            textLayoutResult!!.getCursorRect(
-                                                textState.selection.start
-                                            )
-                                        )
-                                        selectedLine =
-                                            textState.getTextBeforeSelection(Int.MAX_VALUE)
-                                                .count { it == '\n' } + 1
-                                    }
-                                }
-                                    .pointerHoverIcon(PointerIcon.Hand)
-                                    .drawBehind {
-
-                                        drawLine(
-                                            color = Color.Red,
-                                            strokeWidth = 1.dp.toPx(),
-                                            start = Offset(
-                                                if (it[0] == ' ') 20.sp.toPx() else 0.sp.toPx(),
-                                                size.height - 2.sp.toPx()
-                                            ),
-                                            end = Offset(size.width, size.height - 2.sp.toPx())
-                                        )
-                                    }.horizontalScroll(errorStateHorizontal))
-                        } else
-                            Text(it, color = Color.Red)
-                    }
-                }
+                ErrorPane(
+                    height = resultTabHeight,
+                    verticalState = errorStateVertical,
+                    horizontalState = errorStateHorizontal,
+                    outputList = state.outputList,
+                    errorList = state.errorList,
+                    moveCursor = {errorIndex ->
+                        focusRequester.requestFocus()
+                        //println("ERROR INDEX: $errorIndex")
+                        textState = textState.copy(selection = TextRange(errorIndex))
+                        CoroutineScope(Dispatchers.Main).launch {
+                            bringIntoViewRequester.bringIntoView(
+                                textLayoutResult!!.getCursorRect(
+                                    textState.selection.start
+                                )
+                            )
+                            selectedLine =
+                                textState.getTextBeforeSelection(Int.MAX_VALUE)
+                                    .count { it == '\n' } + 1
+                        }
+                    },
+                    script = textState.text
+                )
 
                 VerticalScrollbar(
                     modifier = Modifier.align(Alignment.CenterEnd)
